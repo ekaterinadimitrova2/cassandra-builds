@@ -62,7 +62,8 @@ _run_testlist() {
       testlist="$( _list_tests "${_target_prefix}" | head -n1)"
     fi
     ant clean jar
-    ant $_testlist_target -Dtest.classlistprefix="${_target_prefix}" -Dtest.classlistfile=<(echo "${testlist}") -Dtest.timeout="${_test_timeout}" -Dtmp.dir="${TMP_DIR}" || echo "failed ${_target_prefix} ${_testlist_target}"
+    ant jacoco-run -Dtaskname=$_testlist_target -Dtest.classlistprefix="${_target_prefix}" -Dtest.classlistfile=<(echo "${testlist}") -Dtest.timeout="${_test_timeout}" -Dtmp.dir="${TMP_DIR}" || echo "failed ${_target_prefix} 
+${_testlist_target}"
 }
 
 _main() {
@@ -107,12 +108,12 @@ _main() {
     "stress-test")
       # hard fail on test compilation, but dont fail the test run as unstable test reports are processed
       ant clean jar stress-build-test
-      ant $target -Dtmp.dir="$(pwd)/tmp" || echo "failed $target"
+      ant jacoco-run -Dtaskname=$target -Dtmp.dir="$(pwd)/tmp" || echo "failed $target"
       ;;
     "fqltool-test")
       # hard fail on test compilation, but dont fail the test run so unstable test reports are processed
       ant clean jar fqltool-build-test
-      ant $target -Dtmp.dir="$(pwd)/tmp" || echo "failed $target"
+      ant jacoco-run -Dtaskname=$target -Dtmp.dir="$(pwd)/tmp" || echo "failed $target"
       ;;
     "microbench")
       ant clean $target -Dtmp.dir="$(pwd)/tmp" -Dmaven.test.failure.ignore=true
@@ -140,7 +141,7 @@ _main() {
           echo Hacking jvm-dtest to run only first test found as no tests in split ${split_chunk} were found
           testlist="$( _list_tests "distributed"  | grep -v "upgrade" | head -n1)"
       fi
-      ant testclasslist -Dtest.classlistprefix=distributed -Dtest.timeout=$(_timeout_for "test.distributed.timeout") -Dtest.classlistfile=<(echo "${testlist}") -Dtmp.dir="${TMP_DIR}" || echo "failed $target"
+      ant jacoco-run -Dtaskname=testclasslist -Dtest.classlistprefix=distributed -Dtest.timeout=$(_timeout_for "test.distributed.timeout") -Dtest.classlistfile=<(echo "${testlist}") -Dtmp.dir="${TMP_DIR}" || echo "failed $target"
       ;;
     "jvm-dtest-upgrade")
       _build_all_dtest_jars
@@ -150,7 +151,7 @@ _main() {
           echo Hacking jvm-dtest-upgrade to run only first test found as no tests in split ${split_chunk} were found
           testlist="$( _list_tests "distributed"  | grep "upgrade" | head -n1)"
       fi
-      ant testclasslist -Dtest.classlistprefix=distributed -Dtest.timeout=$(_timeout_for "test.distributed.timeout") -Dtest.classlistfile=<(echo "${testlist}") -Dtmp.dir="${TMP_DIR}" || echo "failed $target"
+      ant jacoco-run -Dtaskname=testclasslist -Dtest.classlistprefix=distributed -Dtest.timeout=$(_timeout_for "test.distributed.timeout") -Dtest.classlistfile=<(echo "${testlist}") -Dtmp.dir="${TMP_DIR}" || echo "failed $target"
       ;;
     "cqlsh-test")
       ./pylib/cassandra-cqlsh-tests.sh .

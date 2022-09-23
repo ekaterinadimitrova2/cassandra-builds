@@ -233,6 +233,11 @@ matrixJob('Cassandra-template-test') {
             allowEmpty()
             fingerprint()
         }
+        jacocoCodeCoverage {
+            changeBuildStatus(false)
+            execPattern("**/**.exec")
+            sourcePattern("src/**/*.java,tools/**/*.java")
+        }
     }
 }
 
